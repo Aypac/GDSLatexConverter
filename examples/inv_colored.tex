@@ -1,0 +1,47 @@
+
+% !TeX encoding = UTF-8
+% !TeX spellcheck = de_DE
+
+\documentclass[11pt,border=0mm]{standalone}
+\usepackage{mathptmx} %"Times New Roman" clone: Nimbus Roman No9 L
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+%\usetikzlibrary{external} 
+%\tikzexternalize
+
+
+% DEFINE PICS
+% inv1
+\tikzset {inv1_2_0017E/.pic={
+    % polygons in this cell
+    \path (0.00000, 0.00000) -- (5.00000, 0.00000) -- (5.00000, 2.00000) -- (0.00000, 2.00000) -- (0.00000, 0.00000) {};
+    \path (0.00000, 22.00000) -- (5.00000, 22.00000) -- (5.00000, 24.00000) -- (0.00000, 24.00000) -- (0.00000, 22.00000) {};
+    
+    % references in this cell to other cells
+    
+}}
+% inv1
+\tikzset {inv1_42_0017E/.pic={
+    % polygons in this cell
+    \path (4.50000, 17.10000) -- (4.50000, 17.50000) -- (5.00000, 17.50000) -- (5.00000, 21.90000) -- (0.00000, 21.90000) -- (0.00000, 17.50000) -- (0.50000, 17.50000) -- (0.50000, 17.10000) -- (4.50000, 17.10000) {};
+    \path (1.30000, 21.50000) -- (3.70000, 21.50000) -- (3.70000, 23.90000) -- (1.30000, 23.90000) -- (1.30000, 21.50000) {};
+    
+    % references in this cell to other cells
+    
+}}
+
+% END: DEFINE PICS
+\begin{document}
+    \begin{tikzpicture}
+        \begin{scope}[every path/.append style={draw=black!20, }]
+            \pic{inv1_2_0017E};
+        \end{scope}
+        \begin{scope}[every path/.append style={draw=black!20, }]
+            \pic{inv1_42_0017E};
+        \end{scope}
+        
+    \end{tikzpicture}
+\end{document}
