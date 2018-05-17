@@ -1,21 +1,30 @@
+"""
+This python library allows conversion of gds (gdsII/gds2) files / gdspy
+libraries to latex (and subsequent svg, pdf, png, jpeg, ...).
+More information on https://github.com/Aypac/GDSLatexConverter
+@version 0.1a
+@author René Vollmer
+"""
+
 import gdspy
 import numpy as np
 import re
-import hashlib
-import base64
+#import hashlib
+#import base64
 
 
 class GDSLatexConverter:
     _latex = None
     _BIND = ' -- '
     _TAB = "    "
+    VERSION = '0.1a'
 
-    def __init__(self, gdslibrary: gdspy.GdsLibrary, layer_order: list = None):
+    def __init__(self, gdslibrary: gdspy.GdsLibrary):
         assert type(gdslibrary) is gdspy.GdsLibrary, 'Please pass a gdspy.GdsLibrary to the parameter gdslibrary.'
         self.gdslibrary = gdslibrary
         self.layer_per_cell = {}
 
-        self.scale = 1e-2
+        self.scale = 1
         self.layer_drawcolor = {}
         self.layer_drawopt = {}
         self.layer_per_cell = {}
@@ -24,10 +33,7 @@ class GDSLatexConverter:
         self.all_layer = np.unique([k for l in all_cells.values()
                                     for k in l.get_layers()])
 
-        if layer_order is None:
-            self.layer_order = self.all_layer[:]
-        else:
-            self.layer_order = layer_order
+        self.layer_order = self.all_layer[:]
 
     def get_latex(self):
         if not self._latex:
@@ -65,7 +71,10 @@ class GDSLatexConverter:
 
         latex = """
 % !TeX encoding = UTF-8
-% !TeX spellcheck = de_DE
+% !TeX spellcheck = en_GB
+
+% Created with GDSLatexConverter v""" + self.VERSION + """
+% For more information, visit https://github.com/Aypac/GDSLatexConverter 
 
 \\documentclass[11pt,border=0mm]{standalone}
 \\usepackage{mathptmx} %"Times New Roman" clone: Nimbus Roman No9 L
