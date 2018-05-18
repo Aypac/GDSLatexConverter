@@ -26,7 +26,7 @@ def license():
         return f.read()
 
 setup(name='GDSLatexConverter',
-      version=get_version(),
+      version='0.2',
       use_2to3=False,
       author='René Vollmer',
       author_email='admin@aypac.de',
@@ -47,7 +47,7 @@ setup(name='GDSLatexConverter',
       # license=license(),
       # if we want to install without tests:
       # packages=find_packages(exclude=["*.tests", "tests"]),
-      # packages=[ ],
+      packages=['GDSLatexConverter', ],
       install_requires=[
           'gdspy>=1.2',
           'numpy>=1.13.3',
