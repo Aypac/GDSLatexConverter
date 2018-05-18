@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+import sys
+sys.path.append('GDSLatexConverter')
 from GDSLatexConverter import GDSLatexConverter
      
 from setuptools import setup, find_packages
@@ -10,7 +12,7 @@ import re
 
 
 def get_version(verbose=1):
-    v = GDSLatexConverter.__version__
+    v = GDSLatexConverter.GDSLatexConverter.__version__
     if verbose:
         print(v)
     return v
@@ -26,7 +28,7 @@ def license():
         return f.read()
 
 setup(name='GDSLatexConverter',
-      version='0.2',
+      version='0.1',
       use_2to3=False,
       author='René Vollmer',
       author_email='admin@aypac.de',
