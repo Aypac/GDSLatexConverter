@@ -12,7 +12,7 @@ import re
 
 
 def get_version(verbose=1):
-    v = GDSLatexConverter.__version__
+    v = GDSLatexConverter.GDSLatexConverter.__version__
     if verbose:
         print(v)
     return v
