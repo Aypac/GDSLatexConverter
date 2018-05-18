@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
 import sys
-sys.path.append('GDSLatexConverter')
-from GDSLatexConverter import GDSLatexConverter
-     
+sys.path.append('./GDSLatexConverter')
+import GDSLatexConverter
+import os
 from setuptools import setup, find_packages
-from distutils.version import StrictVersion
-from importlib import import_module
-import re
 
 
 def get_version(verbose=1):
@@ -17,25 +13,18 @@ def get_version(verbose=1):
         print(v)
     return v
 
-
-def readme():
-    with open('README.md') as f:
-        return f.read()
-
-
-def license():
-    with open('LICENSE') as f:
-        return f.read()
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name='GDSLatexConverter',
-      version='0.1',
+      version=get_version(),
       use_2to3=False,
-      author='René Vollmer',
+      author='Rene Vollmer',
       author_email='admin@aypac.de',
-      maintainer='René Vollmer',
+      maintainer='Rene Vollmer',
       maintainer_email='admin@aypac.de',
       description='GDS to latex pdf converter',
-      # long_description=readme(),
+      long_description=read('README.md'),
       url='https://github.com/Aypac/GDSLatexConverter',
       classifiers=[
           'Development Status :: 3 - Alpha',
@@ -44,11 +33,12 @@ setup(name='GDSLatexConverter',
           'Intended Audience :: Developers'
           'Programming Language :: Python :: 3 :: Only',
           'Programming Language :: Python :: 3.6',
-          'Topic :: Scientific/Engineering'
+          'Topic :: Scientific/Engineering',
       ],
-      # license=license(),
+      # license=read('LICENCE'),
       # if we want to install without tests:
       # packages=find_packages(exclude=["*.tests", "tests"]),
+      #packages=find_packages(),
       packages=['GDSLatexConverter', ],
       install_requires=[
           'gdspy>=1.2',
@@ -56,4 +46,5 @@ setup(name='GDSLatexConverter',
           ],
       # 're>=2.2.1' is a standard part of python
       # test_suite='pyqip.tests',
-zip_safe=False)
+      zip_safe=False,
+)

@@ -17,7 +17,7 @@ class GDSLatexConverter:
     _latex = None
     _BIND = '--'
     _TAB = "    "
-    __version__ = '0.2'
+    __version__ = '0.1'
 
     def __init__(self, gdslibrary: gdspy.GdsLibrary):
         assert type(gdslibrary) is gdspy.GdsLibrary, 'Please pass a gdspy.GdsLibrary to the parameter gdslibrary.'
