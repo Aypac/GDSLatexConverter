@@ -15,9 +15,9 @@ import re
 
 class GDSLatexConverter:
     _latex = None
-    _BIND = ' -- '
+    _BIND = '--'
     _TAB = "    "
-    VERSION = '0.1a'
+    __version__ = '0.1a'
 
     def __init__(self, gdslibrary: gdspy.GdsLibrary):
         assert type(gdslibrary) is gdspy.GdsLibrary, 'Please pass a gdspy.GdsLibrary to the parameter gdslibrary.'
@@ -73,7 +73,7 @@ class GDSLatexConverter:
 % !TeX encoding = UTF-8
 % !TeX spellcheck = en_GB
 
-% Created with GDSLatexConverter v""" + self.VERSION + """
+% Created with GDSLatexConverter v""" + self.__version__ + """
 % For more information, visit https://github.com/Aypac/GDSLatexConverter 
 
 \\documentclass[11pt,border=0mm]{standalone}
@@ -172,12 +172,12 @@ class GDSLatexConverter:
         polygons_text = ''
         for i, points in enumerate(points_list):
             polygon_text = '\\path '  # ['+self._get_layer_options(layer)+']'
-            points = np.append(points, [points[0]], axis=0)
+            #points = np.append(points, [points[0]], axis=0)
             strs = ['({:.5f}, {:.5f})'.format(pts[0] * self.scale,
                                               pts[1] * self.scale)
                     for pts in points]
             polygon_text += self._BIND.join(strs)
-            polygon_text += ' {};\n'
+            polygon_text += self._BIND + 'cycle {};\n'
             polygons_text += polygon_text
         return polygons_text
 
