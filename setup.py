@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-import os
-os.path.append('GDSLatexConverter')
+import sys
+sys.path.append('GDSLatexConverter')
 from GDSLatexConverter import GDSLatexConverter
      
 from setuptools import setup, find_packages
