@@ -47,7 +47,7 @@ setup(name='GDSLatexConverter',
       # license=license(),
       # if we want to install without tests:
       # packages=find_packages(exclude=["*.tests", "tests"]),
-      packages=find_packages(),
+      packages=['GDSLatexConverter', ],
       install_requires=[
           'gdspy>=1.2',
           'numpy>=1.13.3',
