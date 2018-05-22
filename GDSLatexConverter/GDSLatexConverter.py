@@ -2,7 +2,6 @@
 This python library allows conversion of gds (gdsII/gds2) files / gdspy
 libraries to latex (and subsequent svg, pdf, png, jpeg, ...).
 More information on https://github.com/Aypac/GDSLatexConverter
-@version 0.1a
 @author René Vollmer
 """
 
@@ -17,7 +16,7 @@ class GDSLatexConverter:
     _latex = None
     _BIND = '--'
     _TAB = "    "
-    __version__ = '0.1'
+    __version__ = '0.11'
 
     def __init__(self, gdslibrary: gdspy.GdsLibrary):
         assert type(gdslibrary) is gdspy.GdsLibrary, 'Please pass a gdspy.GdsLibrary to the parameter gdslibrary.'
@@ -107,15 +106,15 @@ class GDSLatexConverter:
             layers = np.append(layers, cl)
             layers = np.unique(layers)
 
-        if hasattr(cell, 'points'):
+        elif hasattr(cell, 'points'):
             layers = np.append(layers, [cell.layer])
             layers = np.unique(layers)
 
-        if type(cell) is gdspy.Cell:
+        elif hasattr(cell, 'elements'):
             for element in cell.elements:
                 layers = self._rec_check_poly(cell=element, layers=layers)
 
-        if hasattr(cell, 'ref_cell'):
+        elif hasattr(cell, 'ref_cell'):
             layers = self._rec_check_poly(cell=cell.ref_cell, layers=layers)
 
         return layers
@@ -165,14 +164,20 @@ class GDSLatexConverter:
 
         return tex
 
-    def _get_elem_attr(self, element, attr: str, default=None):
-        return getattr(element, attr, default)
+    def _parse_polygons(self, points_list, layer, addLayerOptions=False):
+        """
+        Turns a GDS polygon into a latex path.
 
-    def _parse_polygons(self, points_list, layer):
+        :param points_list:
+        :param layer:
+        :param addLayerOptions:
+        :return: (str) latex path command
+        """
         polygons_text = ''
         for i, points in enumerate(points_list):
-            polygon_text = '\\path '  # ['+self._get_layer_options(layer)+']'
-            #points = np.append(points, [points[0]], axis=0)
+            polygon_text = '\\path '
+            if addLayerOptions:
+                polygon_text += '[' + self._get_layer_options(layer) + ']'
             strs = ['({:.5f}, {:.5f})'.format(pts[0] * self.scale,
                                               pts[1] * self.scale)
                     for pts in points]
@@ -181,45 +186,116 @@ class GDSLatexConverter:
             polygons_text += polygon_text
         return polygons_text
 
-    def _make_scope(self, cell, layer, options,
-                    rows: int = 1, cols: int = 1, spacing: float = 0):
+    def _make_scope(self, cell: gdspy.Cell, layer: int, options, inner_code: str=None):
         if type(options) is dict:
             options = ', '.join([str(k) + '=' + str(options[k]) for k in options])
-        fct = self._get_cell_call(cell=cell, layer=layer)
-        scope = "\\begin{scope}[" + options + "]\n"
-        scope += self._indent(fct)
-        scope += "\n\\end{scope}\n"
-        if rows > 1:
-            # todo put in for loop
-            scope = self._indent(scope)
-            scope = '' + scope + ''
-        if cols > 1:
-            # todo put in for loop
-            scope = self._indent(scope)
-            scope = '' + scope + ''
-        return scope
+        if inner_code is None:
+            fct = self._get_cell_call(cell=cell, layer=layer)
+        else:
+            fct = inner_code
+
+        if options != '':
+            scope = "\\begin{scope}[" + options + "]\n"
+            scope += self._indent(fct)
+            scope += "\n\\end{scope}\n"
+            return scope
+        else:
+            return fct + "\n"
 
     def _make_ref_scope(self, ref_cell, layer, options=None):
+        """
+        This translates a GDS reference cell into a latex scope.
+        It tries to produce as little code as possible.
+
+        In GDS, the order of transformation is as follows:
+            1. mirror
+            2. rotation
+            3. scale
+            4. offset
+        (Source: http://www.artwork.com/gdsii/gdsscale/index.htm )
+
+        :param ref_cell:
+        :param layer:
+        :param options:
+        :return:
+        """
+
+        needs_transform = False
         ref = type(ref_cell) is gdspy.CellReference
         refArr = type(ref_cell) is gdspy.CellArray
-        assert ref or refArr, 'Is neither cell reference nor cell array'
+        assert ref or refArr, 'ref_cell is neither cell reference nor cell array'
+
         opt = options or {}
-        if self._get_elem_attr(element=ref_cell, attr='origin') is not None:
-            o = self._get_elem_attr(element=ref_cell, attr='origin')
-            opt['shift'] = '{(%s, %s)}' % (o[0] * self.scale, o[1] * self.scale)
-        if self._get_elem_attr(element=ref_cell, attr='magnification') is not None:
-            opt['scale'] = self._get_elem_attr(element=ref_cell, attr='magnification')  # / self.scale
-        if self._get_elem_attr(element=ref_cell, attr='rotation') is not None:
-            opt['rotate'] = self._get_elem_attr(element=ref_cell, attr='rotation')
-        if 'scale' in opt or 'rotate' in opt:
+
+        magn = 1
+        m = getattr(ref_cell, 'magnification', None)
+        if m is not None and m != 0:
+            magn = getattr(ref_cell, 'magnification')  # / self.scale
+            needs_transform = True
+        del m
+
+        orig = getattr(ref_cell, 'origin', None)
+        if orig is not None and (orig[0] != 0 or orig[1] != 0):
+            o = getattr(ref_cell, 'origin')
+            s = self.scale
+            opt['shift'] = '{(%s, %s)}' % (o[0] * s, o[1] * s)
+
+        xs = getattr(ref_cell, 'x_reflection', False)
+        ys = getattr(ref_cell, 'y_reflection', False)
+        xf = (1-2*xs)
+        yf = (1-2*ys)
+        if xs or ys:
+            if magn != 1 or ys:
+                opt['xscale'] = yf*magn
+            if magn != 1 or xs:
+                opt['yscale'] = xf*magn
+            needs_transform = True
+        elif magn != 1:
+            opt['scale'] = magn
+            needs_transform = True
+        del xs, ys
+
+        r = getattr(ref_cell, 'rotation', None)
+        if r is not None and r != 0:
+            opt['rotate'] = ((xf * yf * r + 180) % 360) - 180
+            needs_transform = True
+        del r
+
+        if needs_transform:
             opt['every node/.append style'] = '{transform shape}'
 
-        r = self._get_elem_attr(element=ref_cell, attr='rows', default=1)
-        c = self._get_elem_attr(element=ref_cell, attr='columns', default=1)
-        s = self._get_elem_attr(element=ref_cell, attr='spacing', default=0)
+        rows = getattr(ref_cell, 'rows', 1)
+        cols = getattr(ref_cell, 'columns', 1)
+        spacing = getattr(ref_cell, 'spacing', (0, 0))
 
-        return self._make_scope(cell=ref_cell.ref_cell, layer=layer, options=opt,
-                                rows=r, cols=c, spacing=s)
+        if rows > 1 or cols > 1:
+            innerOpt = {}
+            xtext = ''
+            if cols > 1:
+                xtext = '\\x*'+str(spacing[0]*self.scale)
+            ytext = ''
+            if rows > 1:
+                ytext = '\\y*'+str(spacing[1]*self.scale)
+
+                innerOpt['shift'] = '{('+xtext+', '+ytext+')}'
+
+            scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
+                                     options=innerOpt)
+            if cols > 1:
+                scope = self._indent(scope)
+                fl = '\\foreach \\x in {0,...,%d} {\n' % ((cols-1),)
+                scope = fl + scope + '\n}\n'
+            if rows > 1:
+                scope = self._indent(scope)
+                fl = '\\foreach \\y in {0,...,%d} {\n' % ((rows-1),)
+                scope = fl + scope + '\n}\n'
+
+            scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
+                                     options=opt, innerCode=scope)
+            return scope
+        else:
+            return self._make_scope(cell=ref_cell.ref_cell, layer=layer,
+                             options=opt)
 
     def _get_cell_call(self, cell, layer):
         return '\\pic{' + self._convert_name(cell=cell, layer=layer) + '};'
