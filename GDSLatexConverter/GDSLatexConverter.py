@@ -106,15 +106,15 @@ class GDSLatexConverter:
             layers = np.append(layers, cl)
             layers = np.unique(layers)
 
-        if hasattr(cell, 'points'):
+        elif hasattr(cell, 'points'):
             layers = np.append(layers, [cell.layer])
             layers = np.unique(layers)
 
-        if type(cell) is gdspy.Cell:
+        elif hasattr(cell, 'elements'):
             for element in cell.elements:
                 layers = self._rec_check_poly(cell=element, layers=layers)
 
-        if hasattr(cell, 'ref_cell'):
+        elif hasattr(cell, 'ref_cell'):
             layers = self._rec_check_poly(cell=cell.ref_cell, layers=layers)
 
         return layers
@@ -186,10 +186,14 @@ class GDSLatexConverter:
             polygons_text += polygon_text
         return polygons_text
 
-    def _make_scope(self, cell, layer, options):
+    def _make_scope(self, cell: gdspy.Cell, layer: int, options, inner_code: str=None):
         if type(options) is dict:
             options = ', '.join([str(k) + '=' + str(options[k]) for k in options])
-        fct = self._get_cell_call(cell=cell, layer=layer)
+        if inner_code is None:
+            fct = self._get_cell_call(cell=cell, layer=layer)
+        else:
+            fct = inner_code
+
         if options != '':
             scope = "\\begin{scope}[" + options + "]\n"
             scope += self._indent(fct)
@@ -241,10 +245,10 @@ class GDSLatexConverter:
         xf = (1-2*xs)
         yf = (1-2*ys)
         if xs or ys:
-            if magn != 1 or xs:
-                opt['xscale'] = xf*magn
             if magn != 1 or ys:
-                opt['yscale'] = yf*magn
+                opt['xscale'] = yf*magn
+            if magn != 1 or xs:
+                opt['yscale'] = xf*magn
             needs_transform = True
         elif magn != 1:
             opt['scale'] = magn
@@ -253,7 +257,7 @@ class GDSLatexConverter:
 
         r = getattr(ref_cell, 'rotation', None)
         if r is not None and r != 0:
-            opt['rotate'] = ((r + 180) % 360) - 180
+            opt['rotate'] = ((xf * yf * r + 180) % 360) - 180
             needs_transform = True
         del r
 
@@ -262,35 +266,32 @@ class GDSLatexConverter:
 
         rows = getattr(ref_cell, 'rows', 1)
         cols = getattr(ref_cell, 'columns', 1)
-        spacing = getattr(ref_cell, 'spacing', 0)
+        spacing = getattr(ref_cell, 'spacing', (0, 0))
 
-        rows, cols = 1, 1 #todo: remove
         if rows > 1 or cols > 1:
-            # todo generalize for loop, using the spacing
-
+            innerOpt = {}
             xtext = ''
-            if rows > 1:
-                xtext = '\\x'
-            ytext = ''
             if cols > 1:
-                ytext = '\\y'
+                xtext = '\\x*'+str(spacing[0]*self.scale)
+            ytext = ''
+            if rows > 1:
+                ytext = '\\y*'+str(spacing[1]*self.scale)
 
-            if 'shift' in opt:
-                xtext += ' + '+str(opt['shift'][0])
-                ytext += ' + '+str(opt['shift'][1])
-
-            opt['shift'] = (xtext, ytext)
+                innerOpt['shift'] = '{('+xtext+', '+ytext+')}'
 
             scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
-                         options=opt)
-            if rows > 1:
-                scope = self._indent(scope)
-                fl = '\\foreach \\x in {1,...,%d} {' % rows
-                scope = fl + scope + '}'
+                                     options=innerOpt)
             if cols > 1:
                 scope = self._indent(scope)
-                fl = '\\foreach \\y in {1,...,%d} {' % cols
-                scope = fl + scope + '}'
+                fl = '\\foreach \\x in {0,...,%d} {\n' % ((cols-1),)
+                scope = fl + scope + '\n}\n'
+            if rows > 1:
+                scope = self._indent(scope)
+                fl = '\\foreach \\y in {0,...,%d} {\n' % ((rows-1),)
+                scope = fl + scope + '\n}\n'
+
+            scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
+                                     options=opt, innerCode=scope)
             return scope
         else:
             return self._make_scope(cell=ref_cell.ref_cell, layer=layer,
