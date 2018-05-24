@@ -362,7 +362,7 @@ class GDSLatexConverter:
         else:
             raise UserWarning('Unsupported TEX type ' + str(self.textype))
 
-        command = textype + " '" + filename + ".tex'"
+        command = textype + " " + filename + ".tex"
         status = os.system(command)
         if status == 0:
             print('PDF compilation successful.')
