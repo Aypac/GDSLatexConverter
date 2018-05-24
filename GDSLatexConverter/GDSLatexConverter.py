@@ -9,8 +9,10 @@ import gdspy
 import numpy as np
 import re
 import os
-#import hashlib
-#import base64
+
+
+# import hashlib
+# import base64
 
 
 class GDSLatexConverter:
@@ -188,7 +190,7 @@ class GDSLatexConverter:
             polygons_text += polygon_text
         return polygons_text
 
-    def _make_scope(self, cell: gdspy.Cell, layer: int, options, inner_code: str=None):
+    def _make_scope(self, cell: gdspy.Cell, layer: int, options, inner_code: str = None):
         if type(options) is dict:
             options = ', '.join([str(k) + '=' + str(options[k]) for k in options])
         if inner_code is None:
@@ -244,13 +246,13 @@ class GDSLatexConverter:
 
         xs = getattr(ref_cell, 'x_reflection', False)
         ys = getattr(ref_cell, 'y_reflection', False)
-        xf = (1-2*xs)
-        yf = (1-2*ys)
+        xf = (1 - 2 * xs)
+        yf = (1 - 2 * ys)
         if xs or ys:
             if magn != 1 or ys:
-                opt['xscale'] = yf*magn
+                opt['xscale'] = yf * magn
             if magn != 1 or xs:
-                opt['yscale'] = xf*magn
+                opt['yscale'] = xf * magn
             needs_transform = True
         elif magn != 1:
             opt['scale'] = magn
@@ -274,22 +276,22 @@ class GDSLatexConverter:
             innerOpt = {}
             xtext = ''
             if cols > 1:
-                xtext = '\\x*'+str(spacing[0]*self.scale)
+                xtext = '\\x*' + str(spacing[0] * self.scale)
             ytext = ''
             if rows > 1:
-                ytext = '\\y*'+str(spacing[1]*self.scale)
+                ytext = '\\y*' + str(spacing[1] * self.scale)
 
-                innerOpt['shift'] = '{('+xtext+', '+ytext+')}'
+                innerOpt['shift'] = '{(' + xtext + ', ' + ytext + ')}'
 
             scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
                                      options=innerOpt)
             if cols > 1:
                 scope = self._indent(scope)
-                fl = '\\foreach \\x in {0,...,%d} {\n' % ((cols-1),)
+                fl = '\\foreach \\x in {0,...,%d} {\n' % ((cols - 1),)
                 scope = fl + scope + '\n}\n'
             if rows > 1:
                 scope = self._indent(scope)
-                fl = '\\foreach \\y in {0,...,%d} {\n' % ((rows-1),)
+                fl = '\\foreach \\y in {0,...,%d} {\n' % ((rows - 1),)
                 scope = fl + scope + '\n}\n'
 
             scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
@@ -297,7 +299,7 @@ class GDSLatexConverter:
             return scope
         else:
             return self._make_scope(cell=ref_cell.ref_cell, layer=layer,
-                             options=opt)
+                                    options=opt)
 
     def _get_cell_call(self, cell, layer):
         return '\\pic{' + self._convert_name(cell=cell, layer=layer) + '};'
@@ -339,13 +341,15 @@ class GDSLatexConverter:
     def compile(self, filename, overwrite=False):
         self.parse()
 
+        fn = filename + '.tex'
         if overwrite:
-            filemode = 'w+'
+            fout = open(fn, mode='w+')
         else:
-            filemode = 'w'
+            fout = open_if_not_exists(fn, mode='w+')
+            if fout == False:
+                raise FileExistsError('Output file exists. Please delete, pass different name or pass overwrite=True.')
 
         # Write the latex output to file
-        fout = open(filename + '.tex', filemode)
         fout.write(self._latex)
         fout.close()
 
@@ -366,3 +370,11 @@ class GDSLatexConverter:
             print('> ' + command)
             print("Check the file '" + str(filename) + ".log' for more information.")
             return status
+
+def open_if_not_exists(filename, mode='w'):
+    try:
+        fd = os.open(filename, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except OSError:
+        return False
+    else:
+        return os.fdopen(fd, mode=mode)
