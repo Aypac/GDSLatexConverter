@@ -8,6 +8,7 @@ More information on https://github.com/Aypac/GDSLatexConverter
 import gdspy
 import numpy as np
 import re
+import os
 #import hashlib
 #import base64
 
@@ -16,7 +17,7 @@ class GDSLatexConverter:
     _latex = None
     _BIND = '--'
     _TAB = "    "
-    __version__ = '0.12'
+    __version__ = '0.13'
     textype = None
     PDFLATEX = 1
     LUALATEX = 2
@@ -334,3 +335,34 @@ class GDSLatexConverter:
         else:
             name = cell.name
         return name, cell
+
+    def compile(self, filename, overwrite=False):
+        self.parse()
+
+        if overwrite:
+            filemode = 'w+'
+        else:
+            filemode = 'w'
+
+        # Write the latex output to file
+        fout = open(filename + '.tex', filemode)
+        fout.write(self._latex)
+        fout.close()
+
+        if self.textype == GDSLatexConverter.PDFLATEX:
+            textype = 'pdflatex'
+        elif self.textype == GDSLatexConverter.LUALATEX:
+            textype = 'lualatex'
+        else:
+            raise UserWarning('Unsupported TEX type ' + str(self.textype))
+
+        command = textype + " '" + filename + ".tex'"
+        status = os.system(command)
+        if status == 0:
+            print('PDF compilation successful.')
+        else:
+            print("PDF compilation not successful! Code: " + str(status))
+            print("Ran command:")
+            print('> ' + command)
+            print("Check the file '" + str(filename) + ".log' for more information.")
+            return status
