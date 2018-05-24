@@ -16,7 +16,10 @@ class GDSLatexConverter:
     _latex = None
     _BIND = '--'
     _TAB = "    "
-    __version__ = '0.11'
+    __version__ = '0.12'
+    textype = None
+    PDFLATEX = 1
+    LUALATEX = 2
 
     def __init__(self, gdslibrary: gdspy.GdsLibrary):
         assert type(gdslibrary) is gdspy.GdsLibrary, 'Please pass a gdspy.GdsLibrary to the parameter gdslibrary.'
@@ -33,6 +36,7 @@ class GDSLatexConverter:
                                     for k in l.get_layers()])
 
         self.layer_order = self.all_layer[:]
+        self.textype = GDSLatexConverter.LUALATEX
 
     def get_latex(self):
         if not self._latex:
@@ -68,26 +72,23 @@ class GDSLatexConverter:
                     opt = 'every path/.append style={' + self._get_layer_options(layer) + '}'
                     fcts += self._make_scope(cell=cell, layer=layer, options=opt)
 
-        latex = """
-% !TeX encoding = UTF-8
-% !TeX spellcheck = en_GB
+        latex = "% !TeX encoding = UTF-8\n"
+        latex += "% Created with GDSLatexConverter v" + self.__version__ + "\n"
+        latex += "% For more information, visit https://github.com/Aypac/GDSLatexConverter\n\n"
+        if self.textype == GDSLatexConverter.LUALATEX:
+            latex += "% Use lualatex to compile\n"
+        elif self.textype == GDSLatexConverter.PDFLATEX:
+            latex += "% Use pdflatex to compile\n"
 
-% Created with GDSLatexConverter v""" + self.__version__ + """
-% For more information, visit https://github.com/Aypac/GDSLatexConverter 
+        if self.textype == GDSLatexConverter.LUALATEX:
+            latex += "\RequirePackage{luatex85}\n"
 
-\\documentclass[11pt,border=0mm]{standalone}
-\\usepackage{mathptmx} %"Times New Roman" clone: Nimbus Roman No9 L
-
-\\usepackage[utf8]{inputenc}
-
-\\usepackage{tikz}
-\\usetikzlibrary{patterns}
-%\\usetikzlibrary{external} 
-%\\tikzexternalize
-
-
-% DEFINE PICS
-"""
+        latex += "\\documentclass[border=0mm]{standalone}\n"
+        if self.textype != GDSLatexConverter.LUALATEX:
+            latex += "\\usepackage[utf8]{inputenc}\n"
+        latex += "\\usepackage{tikz}\n"
+        latex += "\\usetikzlibrary{patterns}\n\n\n"
+        latex += "% DEFINE PICS\n"
         latex += pics  # self._indent(tlc_pics)
         latex += "\n% END: DEFINE PICS\n\\begin{document}\n"
         latex += self._TAB + "\\begin{tikzpicture}\n"

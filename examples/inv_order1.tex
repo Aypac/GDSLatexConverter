@@ -1,19 +1,12 @@
-
 % !TeX encoding = UTF-8
-% !TeX spellcheck = en_GB
+% Created with GDSLatexConverter v0.12
+% For more information, visit https://github.com/Aypac/GDSLatexConverter
 
-% Created with GDSLatexConverter v0.11
-% For more information, visit https://github.com/Aypac/GDSLatexConverter 
-
-\documentclass[11pt,border=0mm]{standalone}
-\usepackage{mathptmx} %"Times New Roman" clone: Nimbus Roman No9 L
-
-\usepackage[utf8]{inputenc}
-
+% Use lualatex to compile
+\RequirePackage{luatex85}
+\documentclass[border=0mm]{standalone}
 \usepackage{tikz}
 \usetikzlibrary{patterns}
-%\usetikzlibrary{external} 
-%\tikzexternalize
 
 
 % DEFINE PICS
@@ -65,7 +58,7 @@
         \begin{scope}[every path/.append style={draw=black!20, line width=2, fill=green, }]
             \pic{inv1_43_0017E};
         \end{scope}
-        \begin{scope}[every path/.append style={draw=black!20, line width=2, fill=yellow, }]
+        \begin{scope}[every path/.append style={draw=red, line width=2, fill=yellow, }]
             \pic{inv1_42_0017E};
         \end{scope}
         \begin{scope}[every path/.append style={draw=blue, }]

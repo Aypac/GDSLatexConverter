@@ -1,12 +1,12 @@
 # GDSLatexConverter
-This python library allows conversion of gds (gdsII) files / gdspy libraries to latex (and subsequent svg, pdf, png, jpeg, ...).
+This python library allows conversion of gds (II) files / gdspy libraries to (lua-)latex (and subsequent svg, pdf, png, jpeg, ...).
 
 Install using pip:
 
 `pip install git+https://github.com/Aypac/GDSLatexConverter.git`
 
 
-Usage example can be found <a href='/examples/inv_example.ipynb'>here</a>.
+Usage examples can be found <a href='/examples/inv_example.ipynb'>here</a>.
 
 
 Special thanks to <a href='https://github.com/mwb0506'>Marc Beekman</a>.
@@ -15,3 +15,4 @@ Special thanks to <a href='https://github.com/mwb0506'>Marc Beekman</a>.
  - numpy
  - gdspy
  - re (regex library)
+ - (Lualatex or PDFlatex)
