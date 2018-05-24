@@ -347,7 +347,9 @@ class GDSLatexConverter:
         else:
             fout = open_if_not_exists(fn, mode='w+')
             if fout == False:
-                raise FileExistsError('Output file exists. Please delete, pass different name or pass overwrite=True.')
+                errorm = 'Output file exists. ' + \
+                         'Please delete the file, pass different name or overwrite=True.'
+                raise FileExistsError(errorm)
 
         # Write the latex output to file
         fout.write(self._latex)
