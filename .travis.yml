@@ -7,6 +7,6 @@ python:
 # command to install dependencies
 install:
   - pip install -e .
+  - apt-install jupyter
 script:
-  - cd examples
-  - jupyter nbconvert --execute inv_example.ipynb
+  - jupyter nbconvert --execute examples/inv_example.ipynb
