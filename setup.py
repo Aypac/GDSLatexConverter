@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 
 def get_version(verbose=1):
-    v = GDSLatexConverter.GDSLatexConverter.__version__
+    v = 0.1
     if verbose:
         print(v)
     return v
