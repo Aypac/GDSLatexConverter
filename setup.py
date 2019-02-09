@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+__version__ = '0.14'
+
 import sys
 import os
 from setuptools import setup, find_packages
@@ -8,7 +10,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name='GDSLatexConverter',
-      version='0.14',
+      version=__version__,
       use_2to3=False,
       author='Rene Vollmer',
       author_email='admin@aypac.de',
