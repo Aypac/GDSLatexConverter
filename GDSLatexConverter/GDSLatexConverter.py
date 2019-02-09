@@ -75,7 +75,7 @@ class GDSLatexConverter:
                     fcts += self._make_scope(cell=cell, layer=layer, options=opt)
 
         latex = "% !TeX encoding = UTF-8\n"
-        latex += "% Created with GDSLatexConverter v" + self.__version__ + "\n"
+        latex += "% Created with GDSLatexConverter"# v" + self.__version__ + "\n"
         latex += "% For more information, visit https://github.com/Aypac/GDSLatexConverter\n\n"
         if self.textype == GDSLatexConverter.LUALATEX:
             latex += "% Use lualatex to compile\n"
