@@ -6,18 +6,11 @@ import GDSLatexConverter
 import os
 from setuptools import setup, find_packages
 
-
-def get_version(verbose=1):
-    v = 0.1
-    if verbose:
-        print(v)
-    return v
-
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(name='GDSLatexConverter',
-      version=get_version(),
+      version='0.14',
       use_2to3=False,
       author='Rene Vollmer',
       author_email='admin@aypac.de',
