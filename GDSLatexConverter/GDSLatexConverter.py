@@ -19,7 +19,6 @@ class GDSLatexConverter:
     _latex = None
     _BIND = '--'
     _TAB = "    "
-    __version__ = '0.13'
     textype = None
     PDFLATEX = 1
     LUALATEX = 2
