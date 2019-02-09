@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('./GDSLatexConverter')
-import GDSLatexConverter
 import os
 from setuptools import setup, find_packages
 
