@@ -8,5 +8,6 @@ python:
 install:
   - python setup.py -q install
 script:
-virtualenv:
-  system_site_packages: true
+  - cd examples
+  - jupyter nbconvert --to python inv_example.ipynb
+  - python inv_example.py
