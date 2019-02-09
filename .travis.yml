@@ -9,5 +9,4 @@ install:
   - python setup.py -q install
 script:
   - cd examples
-  - jupyter nbconvert --to python inv_example.ipynb
-  - python inv_example.py
+  - jupyter nbconvert --execute inv_example.ipynb
