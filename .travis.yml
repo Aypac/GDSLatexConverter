@@ -6,7 +6,7 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - python setup.py
+  - python setup.py -q install
 script:
   - cd examples
   - jupyter nbconvert --execute inv_example.ipynb
