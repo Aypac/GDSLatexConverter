@@ -36,7 +36,7 @@ setup(name='GDSLatexConverter',
       #packages=find_packages(),
       packages=['GDSLatexConverter', ],
       install_requires=[
-          'gdspy=1.4.1',
+          'gdspy==1.4.1',
           'numpy>=1.13.3',
           ],
       # 're>=2.2.1' is a standard part of python
