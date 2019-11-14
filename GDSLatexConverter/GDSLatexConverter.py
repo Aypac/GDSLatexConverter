@@ -294,7 +294,7 @@ class GDSLatexConverter:
                 scope = fl + scope + '\n}\n'
 
             scope = self._make_scope(cell=ref_cell.ref_cell, layer=layer,
-                                     options=opt, innerCode=scope)
+                                     options=opt, inner_code=scope)
             return scope
         else:
             return self._make_scope(cell=ref_cell.ref_cell, layer=layer,
