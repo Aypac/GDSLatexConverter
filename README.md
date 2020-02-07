@@ -15,6 +15,7 @@ Special thanks to <a href='https://github.com/mwb0506'>Marc Beekman</a>.
 *Python*
  - numpy
  - gdspy
- - re (regex library, install by default)
+ - re (regex library, installed by default)
+
 *Other*
  - Lualatex or PDFlatex
