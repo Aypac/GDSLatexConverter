@@ -12,7 +12,9 @@ Usage examples can be found <a href='/examples/inv_example.ipynb'>here</a>.
 Special thanks to <a href='https://github.com/mwb0506'>Marc Beekman</a>.
 
 ## Dependencies
+*Python*
  - numpy
  - gdspy
- - re (regex library)
- - (Lualatex or PDFlatex)
+ - re (regex library, install by default)
+*Other*
+ - Lualatex or PDFlatex
